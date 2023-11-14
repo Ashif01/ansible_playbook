@@ -1,0 +1,30 @@
+- hosts: developer
+  remote_user: ec2-user
+  become: yes
+  tasks:
+  - name: update my enviroment
+    yum:
+     name: "*"
+     state: latest
+  - name: java installing
+    yum:
+     name: java-1.8.0-amazon-corretto
+     state: present
+  - name: Download tomcat application
+    get_url:
+     url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
+     dest: /opt
+     mode: '0777'
+  - name: Extract tomcat zip file
+    unarchive:
+     src: /opt/apache-tomcat-8.5.95.tar.gz
+     dest: /opt
+     mode: '0777'
+     remote_src: yes
+  - name: starting the tomcat application
+    shell: nohub /opt/apache-tomcat-8.5.95/bin/startup.sh &
+  - name: sorce file copy from master to slave
+    copy:
+     src: /home/ec2-user/sample.war
+     dest: /opt/apache-tomcat-8.5.95/webapps/sample.war
+     mode: '0777'
